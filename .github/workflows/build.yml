@@ -36,10 +36,7 @@ jobs:
           KS="$GITHUB_WORKSPACE/keystore/upload-keystore.jks"
           mkdir -p "$(dirname "$KS")"
           if [ ! -f "$KS" ]; then
-            keytool -genkeypair -v -keystore "$KS" -alias dhikr \
-              -keyalg RSA -keysize 2048 -validity 10000 \
-              -storepass dhikrStopwatch123 -keypass dhikrStopwatch123 \
-              -dname "CN=Dhikr Stopwatch, OU=Personal, O=Personal, L=Dhaka, S=Dhaka, C=BD"
+            keytool -genkeypair -v -keystore "$KS" -alias dhikr -keyalg RSA -keysize 2048 -validity 10000 -storepass dhikrStopwatch123 -keypass dhikrStopwatch123 -dname "CN=Dhikr Stopwatch, OU=Personal, O=Personal, L=Dhaka, S=Dhaka, C=BD"
             echo "created=1" >> "$GITHUB_OUTPUT"
           fi
           echo "KEYSTORE_PATH=$KS" >> "$GITHUB_ENV"
@@ -48,44 +45,42 @@ jobs:
         working-directory: dhikr_stopwatch
         run: |
           if [ -f android/app/build.gradle ]; then
-            cat >> android/app/build.gradle <<'GRADLE'
-
-android {
-    signingConfigs {
-        release {
-            storeFile file(System.getenv("DHIKR_KEYSTORE"))
-            storePassword System.getenv("DHIKR_STORE_PASSWORD")
-            keyAlias System.getenv("DHIKR_KEY_ALIAS")
-            keyPassword System.getenv("DHIKR_KEY_PASSWORD")
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
-}
-GRADLE
+            F=android/app/build.gradle
+            echo '' >> "$F"
+            echo 'android {' >> "$F"
+            echo '    signingConfigs {' >> "$F"
+            echo '        release {' >> "$F"
+            echo '            storeFile file(System.getenv("DHIKR_KEYSTORE"))' >> "$F"
+            echo '            storePassword System.getenv("DHIKR_STORE_PASSWORD")' >> "$F"
+            echo '            keyAlias System.getenv("DHIKR_KEY_ALIAS")' >> "$F"
+            echo '            keyPassword System.getenv("DHIKR_KEY_PASSWORD")' >> "$F"
+            echo '        }' >> "$F"
+            echo '    }' >> "$F"
+            echo '    buildTypes {' >> "$F"
+            echo '        release {' >> "$F"
+            echo '            signingConfig signingConfigs.release' >> "$F"
+            echo '        }' >> "$F"
+            echo '    }' >> "$F"
+            echo '}' >> "$F"
           fi
           if [ -f android/app/build.gradle.kts ]; then
-            cat >> android/app/build.gradle.kts <<'GRADLE'
-
-android {
-    signingConfigs {
-        create("release") {
-            storeFile = file(System.getenv("DHIKR_KEYSTORE")!!)
-            storePassword = System.getenv("DHIKR_STORE_PASSWORD")
-            keyAlias = System.getenv("DHIKR_KEY_ALIAS")
-            keyPassword = System.getenv("DHIKR_KEY_PASSWORD")
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-        }
-    }
-}
-GRADLE
+            F=android/app/build.gradle.kts
+            echo '' >> "$F"
+            echo 'android {' >> "$F"
+            echo '    signingConfigs {' >> "$F"
+            echo '        create("release") {' >> "$F"
+            echo '            storeFile = file(System.getenv("DHIKR_KEYSTORE")!!)' >> "$F"
+            echo '            storePassword = System.getenv("DHIKR_STORE_PASSWORD")' >> "$F"
+            echo '            keyAlias = System.getenv("DHIKR_KEY_ALIAS")' >> "$F"
+            echo '            keyPassword = System.getenv("DHIKR_KEY_PASSWORD")' >> "$F"
+            echo '        }' >> "$F"
+            echo '    }' >> "$F"
+            echo '    buildTypes {' >> "$F"
+            echo '        getByName("release") {' >> "$F"
+            echo '            signingConfig = signingConfigs.getByName("release")' >> "$F"
+            echo '        }' >> "$F"
+            echo '    }' >> "$F"
+            echo '}' >> "$F"
           fi
 
       - name: Build
